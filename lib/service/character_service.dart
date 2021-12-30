@@ -21,19 +21,23 @@ class CharacterService {
     return characters;
   }
 
-  Future<EpisodesModel> getCharactersEpisodes(index) async {
+  Future getCharactersEpisodes(index) async {
     final response = await dio.get(url);
     final body = response.data['results'][index]['episode'] as List;
     int counter = 0;
+    List<EpisodesModel> episodes = <EpisodesModel>[];
 
-    final newUrl = body[counter];
-    final responseNewUrl = await dio.get(newUrl);
-    final newBody = responseNewUrl.data;
-    print(newBody['air_date']);
+    for (counter = 0; counter < body.length; counter++) {
+      final newUrl = body[counter];
+      final responseNewUrl = await dio.get(newUrl);
+      final newBody = responseNewUrl.data;
 
-    final episode =
-        EpisodesModel(name: newBody['name'], airDate: newBody['air_date']);
+      final episode =
+          EpisodesModel(name: newBody['name'], airDate: newBody['air_date']);
 
-    return episode;
+      episodes.add(episode);
+    }
+    print(episodes.length);
+    return episodes;
   }
 }
