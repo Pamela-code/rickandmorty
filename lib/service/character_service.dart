@@ -17,11 +17,10 @@ class CharacterService {
         status: map['status'],
       );
     }).toList();
-
     return characters;
   }
 
-  Future getCharactersEpisodes(index) async {
+  Future<List<EpisodesModel>> getCharactersEpisodes(index) async {
     final response = await dio.get(url);
     final body = response.data['results'][index]['episode'] as List;
     int counter = 0;
@@ -37,7 +36,7 @@ class CharacterService {
 
       episodes.add(episode);
     }
-    print(episodes.length);
+
     return episodes;
   }
 }

@@ -38,11 +38,6 @@ class _CharacterViewState extends State<CharacterView> {
                 const SizedBox(
                   height: 10,
                 ),
-                // ElevatedButton(
-                //     onPressed: () {
-                //       CharacterService().getCharactersEpisodes(0);
-                //     },
-                //     child: Text('data')),
                 Expanded(
                   child: ListView.builder(
                       shrinkWrap: true,
