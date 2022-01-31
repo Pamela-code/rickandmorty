@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rickandmorty/model/character_model.dart';
 import 'package:rickandmorty/service/character_service.dart';
-import 'package:rickandmorty/widgets/description_modal.dart';
+import 'package:rickandmorty/view/widgets/character_list_view.dart';
 
 class CharacterView extends StatefulWidget {
   const CharacterView({Key? key}) : super(key: key);
@@ -22,60 +22,8 @@ class _CharacterViewState extends State<CharacterView> {
         future: CharacterService().getCharacters(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Column(
-              children: [
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  'Characters',
-                  style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            ListTile(
-                              leading: ClipOval(
-                                child:
-                                    Image.network(snapshot.data![index].image),
-                              ),
-                              title: Text(
-                                snapshot.data![index].name,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                              onTap: () => showModalBottomSheet(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return DescriptionModal(
-                                      index: index,
-                                    );
-                                  }),
-                            ),
-                          ],
-                        );
-                      }),
-                ),
-              ],
+            return CharacterList(
+              snapshot: snapshot,
             );
           } else {
             return Column(
