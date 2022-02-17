@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:rickandmorty/model/character_model.dart';
 import 'package:rickandmorty/model/episodes_model.dart';
-import 'package:rickandmorty/service/character_service.dart';
+import 'package:rickandmorty/controller/character_controller.dart';
 
 class DescriptionModal extends StatefulWidget {
   const DescriptionModal({Key? key, required this.index}) : super(key: key);
@@ -12,6 +13,8 @@ class DescriptionModal extends StatefulWidget {
 }
 
 class _DescriptionModalState extends State<DescriptionModal> {
+  final controller = CharacterController();
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -38,7 +41,7 @@ class _DescriptionModalState extends State<DescriptionModal> {
                     right: 40,
                   ),
                   child: FutureBuilder<List<CharacterModel>>(
-                    future: CharacterService().getCharacters(),
+                    future: controller.getCharacters(controller.actualPage),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         return Column(
@@ -114,69 +117,73 @@ class _DescriptionModalState extends State<DescriptionModal> {
                                 ),
                               ],
                             ),
-                            FutureBuilder(
-                                future: CharacterService()
-                                    .getCharactersEpisodes(widget.index),
-                                builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.done) {
-                                    return Column(
-                                      children: [
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        const Text(
-                                          'Episodes:',
-                                          textAlign: TextAlign.justify,
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            color: Colors.green,
-                                            fontWeight: FontWeight.w700,
+                            Observer(builder: (_) {
+                              return FutureBuilder(
+                                  future: controller.getCharactersEpisodes(
+                                      widget.index, controller.actualPage),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.done) {
+                                      return Column(
+                                        children: [
+                                          const SizedBox(
+                                            height: 10,
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        ListView.builder(
-                                          itemCount: (snapshot.data!
-                                                  as List<EpisodesModel>)
-                                              .length,
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, index) {
-                                            var item = (snapshot.data!
-                                                as List<EpisodesModel>)[index];
-                                            return Card(
-                                              color: Colors.lightGreen,
-                                              child: ListTile(
-                                                title: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Text(item.name),
-                                                    Text(
-                                                        'Air Date: ${item.airDate}')
-                                                  ],
+                                          const Text(
+                                            'Episodes:',
+                                            textAlign: TextAlign.justify,
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.green,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          ListView.builder(
+                                            itemCount: (snapshot.data!
+                                                    as List<EpisodesModel>)
+                                                .length,
+                                            physics:
+                                                const NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemBuilder: (context, index) {
+                                              var item = (snapshot.data!
+                                                      as List<EpisodesModel>)[
+                                                  index];
+                                              return Card(
+                                                color: Colors.lightGreen,
+                                                child: ListTile(
+                                                  title: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Text(item.name),
+                                                      Text(
+                                                          'Air Date: ${item.airDate}')
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  } else {
-                                    return Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Center(
-                                          child: CircularProgressIndicator(),
-                                        ),
-                                      ],
-                                    );
-                                  }
-                                })
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  });
+                            })
                           ],
                         );
                       } else {

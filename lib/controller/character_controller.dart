@@ -1,13 +1,41 @@
 import 'package:dio/dio.dart';
 import 'package:rickandmorty/model/episodes_model.dart';
 import '../model/character_model.dart';
+import 'package:mobx/mobx.dart';
 
-class CharacterService {
-  final url = "https://rickandmortyapi.com/api/character/?page=1";
-  final dio = Dio();
+part 'character_controller.g.dart';
 
-  Future<List<CharacterModel>> getCharacters() async {
+class CharacterController = _CharacterControllerBase with _$CharacterController;
+
+abstract class _CharacterControllerBase with Store {
+  @observable
+  var dio = Dio();
+
+  @observable
+  int actualPage = 1;
+
+  @action
+  nextPage() {
+    if (actualPage < 42) {
+      actualPage++;
+      print(actualPage);
+    }
+  }
+
+  @action
+  previousPage() {
+    if (actualPage > 0) {
+      actualPage--;
+      print(actualPage);
+    }
+  }
+
+  @action
+  Future<List<CharacterModel>> getCharacters(page) async {
+    String url = "https://rickandmortyapi.com/api/character/?page=$page";
+
     final response = await dio.get(url);
+    print(url);
     final body = response.data['results'] as List;
     final characters = body.map((map) {
       return CharacterModel(
@@ -20,8 +48,11 @@ class CharacterService {
     return characters;
   }
 
-  Future<List<EpisodesModel>> getCharactersEpisodes(index) async {
+  @action
+  Future<List<EpisodesModel>> getCharactersEpisodes(index, page) async {
+    String url = "https://rickandmortyapi.com/api/character/?page=$page";
     final response = await dio.get(url);
+    print(url);
     final body = response.data['results'][index]['episode'] as List;
     int counter = 0;
     List<EpisodesModel> episodes = <EpisodesModel>[];
